@@ -5,11 +5,10 @@ import (
 	flag "github.com/ogier/pflag"
 	"github.com/yhat/scrape"
 	"golang.org/x/net/html"
+	"github.com/fatih/color"
 	"net/http"
 	"os"
 )
-
-const link string = "https://ethereumprice.org/btc/"
 
 var help bool
 
@@ -22,11 +21,29 @@ func main() {
 	if help == true {
 		PrintHelpMessage()
 	}
-	data := GetData()
-	fmt.Print(data)
+
+  links := map[string]string{
+    "BTC": "https://ethereumprice.org/btc",
+    "ETH": "https://ethereumprice.org",
+    "LTC": "https://ethereumprice.org/ltc",
+  }
+
+  resp := map[string]string{}
+
+  blue := color.New(color.FgBlue).SprintFunc()
+  red := color.New(color.FgRed).SprintFunc()
+  yellow := color.New(color.FgYellow).SprintFunc()
+
+  for k, v := range links {
+    resp[k] = GetData(v)
+  }
+  fmt.Printf("%s: %s\n", blue("BTC"), resp["BTC"])
+  fmt.Printf("%s: %s\n", red("ETH"), resp["ETH"])
+  fmt.Printf("%s: %s\n", yellow("LTC"), resp["LTC"])
+
 }
 
-func GetData() string {
+func GetData(link string) string {
 	resp, err := http.Get(link)
 	if err != nil {
 		panic(err)
@@ -39,7 +56,7 @@ func GetData() string {
 	price, _ := scrape.Find(root, scrape.ById("ep-price"))
 	change, _ := scrape.Find(root, scrape.ById("ep-percent-change"))
 
-	data := fmt.Sprintf("$%s (%s)", scrape.Text(price), scrape.Text(change))
+	data := fmt.Sprintf("$%s (%s%%)", scrape.Text(price), scrape.Text(change))
 	return data
 }
 
