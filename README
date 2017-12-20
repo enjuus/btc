@@ -1,4 +1,3 @@
-scrape for btc, ltc and eth prices and display them in the terminal
+very basic scraper for ethereumprice.org.
 
-todo:
-- add saving to a file
+fetches prices and percentages for btc, eth and ltc
